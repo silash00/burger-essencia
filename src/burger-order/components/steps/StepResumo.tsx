@@ -1,0 +1,169 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  CenteredStep,
+  FormCard,
+  StepLabel,
+  StepTitle,
+  NavRow,
+} from "../ui";
+import { theme, stagger, fadeUp } from "../../theme";
+import { CONFIG } from "../../config";
+import { formatBRL, formatEndereco } from "../../utils";
+import type { StepResumoProps, ResumoItem } from "../../types";
+
+export function StepResumo({
+  data,
+  qtd,
+  onNext,
+  onBack,
+}: StepResumoProps) {
+  const [copied, setCopied] = useState(false);
+  const total = qtd * CONFIG.preco;
+  const janelaLabel = data.janela === 1 ? "19h — 20h30" : "21h — 22h30";
+
+  function copyPix() {
+    navigator.clipboard.writeText(CONFIG.pixKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  const items: ResumoItem[] = [
+    { label: "Nome", value: data.nome },
+    { label: "Combos", value: `${qtd}x 🍔` },
+    { label: "Janela", value: janelaLabel },
+    { label: "Endereço", value: formatEndereco(data.endereco) },
+    { label: "Total", value: formatBRL(total), isTotal: true },
+  ];
+
+  return (
+    <CenteredStep>
+      <FormCard>
+        <StepLabel current={4} total={4} />
+        <StepTitle>
+          Resumo do
+          <br />
+          pedido
+        </StepTitle>
+
+        <motion.div variants={stagger} initial="initial" animate="animate">
+          {items.map((item, i) => (
+            <motion.div
+              key={i}
+              variants={fadeUp}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "14px 0",
+                borderBottom:
+                  i < items.length - 1 ? `1px solid ${theme.border}` : "none",
+              }}
+            >
+              <span
+                style={{
+                  color: theme.muted,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                }}
+              >
+                {item.label}
+              </span>
+              <span
+                style={{
+                  fontWeight: item.isTotal ? 900 : 800,
+                  fontSize: item.isTotal ? 28 : 15,
+                  fontFamily: item.isTotal
+                    ? "'Bebas Neue', sans-serif"
+                    : "inherit",
+                  color: item.isTotal ? theme.yellow : theme.cream,
+                  textAlign: "right",
+                  maxWidth: 220,
+                }}
+              >
+                {item.value}
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scaleY: 0.8 }}
+          animate={{ opacity: 1, scaleY: 1 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: `1.5px solid ${theme.border}`,
+            borderRadius: 16,
+            padding: 20,
+            margin: "24px 0",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              color: theme.muted,
+              marginBottom: 4,
+            }}
+          >
+            Chave Pix
+          </p>
+          <div
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 18,
+              letterSpacing: 2,
+              color: theme.yellow,
+              wordBreak: "break-all",
+              margin: "8px 0",
+            }}
+          >
+            {CONFIG.pixKey}
+          </div>
+          <p style={{ fontSize: 12, color: theme.muted, marginBottom: 12 }}>
+            Transfira {formatBRL(total)} para confirmar o pedido
+          </p>
+          <motion.button
+            type="button"
+            onClick={copyPix}
+            animate={
+              copied
+                ? {
+                    background: "rgba(80,200,80,0.15)",
+                    borderColor: "rgba(80,200,80,0.4)",
+                    color: "#7dff9a",
+                  }
+                : {
+                    background: "rgba(255,202,40,0.1)",
+                    borderColor: "rgba(255,202,40,0.4)",
+                    color: theme.yellow,
+                  }
+            }
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              padding: "12px 28px",
+              border: `1.5px solid rgba(255,202,40,0.4)`,
+              borderRadius: 10,
+              fontWeight: 800,
+              fontSize: 14,
+              cursor: "pointer",
+              letterSpacing: 1,
+              transition: "background 0.3s, border-color 0.3s, color 0.3s",
+            }}
+          >
+            {copied ? "✓ COPIADO!" : "📋 COPIAR CHAVE PIX"}
+          </motion.button>
+        </motion.div>
+
+        <NavRow onBack={onBack} onNext={onNext} nextLabel="JÁ PAGUEI! 🎉" />
+      </FormCard>
+    </CenteredStep>
+  );
+}
