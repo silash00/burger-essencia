@@ -16,7 +16,7 @@ export interface FormData {
   endereco: Endereco;
 }
 
-/** Janela de entrega (id + label) */
+/** Período de entrega (id + label) */
 export interface JanelaOption {
   id: number;
   time: string;

@@ -105,7 +105,7 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
           onde?
         </StepTitle>
 
-        <Field label="Janela de entrega">
+        <Field label="Período de entrega">
           <Controller
             name="janela"
             control={control}

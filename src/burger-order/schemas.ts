@@ -32,7 +32,7 @@ export const stepEntregaSchema = z.object({
     .nullable()
     .refine(
       (v: number | null) => v != null,
-      "Selecione uma janela de entrega",
+      "Selecione um período de entrega",
     ),
   endereco: enderecoSchema,
 });
