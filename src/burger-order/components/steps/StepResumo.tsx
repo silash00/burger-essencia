@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
+import { useFormContext } from "react-hook-form";
 import {
   CenteredStep,
   FormCard,
@@ -8,19 +9,52 @@ import {
   NavRow,
 } from "../ui";
 import { theme, stagger, fadeUp } from "../../theme";
-import { CONFIG } from "../../config";
+import { CONFIG, getJanelaLabel } from "../../config";
 import { formatBRL, formatEndereco } from "../../utils";
-import type { StepResumoProps, ResumoItem } from "../../types";
+import type { StepResumoProps, ResumoItem, FormData } from "../../types";
 
-export function StepResumo({
-  data,
-  qtd,
-  onNext,
-  onBack,
-}: StepResumoProps) {
+const itemLabelStyle: React.CSSProperties = {
+  color: theme.muted,
+  fontSize: 12,
+  fontWeight: 700,
+  textTransform: "uppercase",
+  letterSpacing: 1,
+};
+
+const pixBoxStyle: React.CSSProperties = {
+  background: "rgba(255,255,255,0.04)",
+  border: `1.5px solid ${theme.border}`,
+  borderRadius: 16,
+  padding: 20,
+  margin: "24px 0",
+  textAlign: "center",
+};
+
+const pixKeyStyle: React.CSSProperties = {
+  fontFamily: "'Bebas Neue', sans-serif",
+  fontSize: 18,
+  letterSpacing: 2,
+  color: theme.yellow,
+  wordBreak: "break-all",
+  margin: "8px 0",
+};
+
+const pixBtnStyle: React.CSSProperties = {
+  padding: "12px 28px",
+  border: "1.5px solid rgba(255,202,40,0.4)",
+  borderRadius: 10,
+  fontWeight: 800,
+  fontSize: 14,
+  cursor: "pointer",
+  letterSpacing: 1,
+  transition: "background 0.3s, border-color 0.3s, color 0.3s",
+};
+
+export function StepResumo({ qtd, onNext, onBack }: StepResumoProps) {
+  const { getValues } = useFormContext<FormData>();
+  const data = getValues();
   const [copied, setCopied] = useState(false);
   const total = qtd * CONFIG.preco;
-  const janelaLabel = data.janela === 1 ? "19h — 20h30" : "21h — 22h30";
 
   function copyPix() {
     navigator.clipboard.writeText(CONFIG.pixKey);
@@ -31,7 +65,7 @@ export function StepResumo({
   const items: ResumoItem[] = [
     { label: "Nome", value: data.nome },
     { label: "Combos", value: `${qtd}x 🍔` },
-    { label: "Janela", value: janelaLabel },
+    { label: "Janela", value: getJanelaLabel(data.janela) },
     { label: "Endereço", value: formatEndereco(data.endereco) },
     { label: "Total", value: formatBRL(total), isTotal: true },
   ];
@@ -46,9 +80,9 @@ export function StepResumo({
           pedido
         </StepTitle>
 
-        <motion.div variants={stagger} initial="initial" animate="animate">
+        <m.div variants={stagger} initial="initial" animate="animate">
           {items.map((item, i) => (
-            <motion.div
+            <m.div
               key={i}
               variants={fadeUp}
               style={{
@@ -57,20 +91,12 @@ export function StepResumo({
                 alignItems: "center",
                 padding: "14px 0",
                 borderBottom:
-                  i < items.length - 1 ? `1px solid ${theme.border}` : "none",
+                  i < items.length - 1
+                    ? `1px solid ${theme.border}`
+                    : "none",
               }}
             >
-              <span
-                style={{
-                  color: theme.muted,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                }}
-              >
-                {item.label}
-              </span>
+              <span style={itemLabelStyle}>{item.label}</span>
               <span
                 style={{
                   fontWeight: item.isTotal ? 900 : 800,
@@ -85,22 +111,15 @@ export function StepResumo({
               >
                 {item.value}
               </span>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scaleY: 0.8 }}
           animate={{ opacity: 1, scaleY: 1 }}
           transition={{ delay: 0.4, duration: 0.4 }}
-          style={{
-            background: "rgba(255,255,255,0.04)",
-            border: `1.5px solid ${theme.border}`,
-            borderRadius: 16,
-            padding: 20,
-            margin: "24px 0",
-            textAlign: "center",
-          }}
+          style={pixBoxStyle}
         >
           <p
             style={{
@@ -114,30 +133,19 @@ export function StepResumo({
           >
             Chave Pix
           </p>
-          <div
-            style={{
-              fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: 18,
-              letterSpacing: 2,
-              color: theme.yellow,
-              wordBreak: "break-all",
-              margin: "8px 0",
-            }}
-          >
-            {CONFIG.pixKey}
-          </div>
+          <div style={pixKeyStyle}>{CONFIG.pixKey}</div>
           <p style={{ fontSize: 12, color: theme.muted, marginBottom: 12 }}>
             Transfira {formatBRL(total)} para confirmar o pedido
           </p>
-          <motion.button
+          <m.button
             type="button"
             onClick={copyPix}
             animate={
               copied
                 ? {
                     background: "rgba(80,200,80,0.15)",
-                    borderColor: "rgba(80,200,80,0.4)",
-                    color: "#7dff9a",
+                    borderColor: theme.successBorder,
+                    color: theme.success,
                   }
                 : {
                     background: "rgba(255,202,40,0.1)",
@@ -147,20 +155,11 @@ export function StepResumo({
             }
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            style={{
-              padding: "12px 28px",
-              border: `1.5px solid rgba(255,202,40,0.4)`,
-              borderRadius: 10,
-              fontWeight: 800,
-              fontSize: 14,
-              cursor: "pointer",
-              letterSpacing: 1,
-              transition: "background 0.3s, border-color 0.3s, color 0.3s",
-            }}
+            style={pixBtnStyle}
           >
             {copied ? "✓ COPIADO!" : "📋 COPIAR CHAVE PIX"}
-          </motion.button>
-        </motion.div>
+          </m.button>
+        </m.div>
 
         <NavRow onBack={onBack} onNext={onNext} nextLabel="JÁ PAGUEI! 🎉" />
       </FormCard>

@@ -10,34 +10,18 @@ import {
   ErrorMsg,
   NavRow,
 } from "../ui";
-import type { StepDadosProps } from "../../types";
-import type { FormData } from "../../types";
+import type { StepDadosProps, FormData } from "../../types";
 import { stepDadosSchema } from "../../schemas";
+import { useStepValidation } from "../../hooks/useStepValidation";
 import { formatPhone } from "../../utils";
 
 export function StepDados({ onNext, onBack }: StepDadosProps) {
   const {
     control,
-    getValues,
-    setError,
-    clearErrors,
     formState: { errors },
   } = useFormContext<FormData>();
 
-  function handleNext() {
-    clearErrors(["nome", "cel"]);
-    const result = stepDadosSchema.safeParse({
-      nome: getValues("nome"),
-      cel: getValues("cel"),
-    });
-    if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors;
-      if (fieldErrors.nome?.[0]) setError("nome", { message: fieldErrors.nome[0] });
-      if (fieldErrors.cel?.[0]) setError("cel", { message: fieldErrors.cel[0] });
-      return;
-    }
-    onNext();
-  }
+  const validate = useStepValidation(stepDadosSchema, ["nome", "cel"]);
 
   return (
     <CenteredStep>
@@ -53,7 +37,11 @@ export function StepDados({ onNext, onBack }: StepDadosProps) {
           <Controller
             name="nome"
             control={control}
-            render={({ field }: { field: ControllerRenderProps<FormData, "nome"> }) => (
+            render={({
+              field,
+            }: {
+              field: ControllerRenderProps<FormData, "nome">;
+            }) => (
               <Input
                 value={field.value}
                 onChange={field.onChange}
@@ -69,15 +57,22 @@ export function StepDados({ onNext, onBack }: StepDadosProps) {
           <Controller
             name="cel"
             control={control}
-            render={({ field }: { field: ControllerRenderProps<FormData, "cel"> }) => (
+            render={({
+              field,
+            }: {
+              field: ControllerRenderProps<FormData, "cel">;
+            }) => (
               <Input
                 value={field.value}
                 onChange={(e) =>
-                field.onChange({
-                  ...e,
-                  target: { ...e.target, value: formatPhone(e.target.value) },
-                })
-              }
+                  field.onChange({
+                    ...e,
+                    target: {
+                      ...e.target,
+                      value: formatPhone(e.target.value),
+                    },
+                  })
+                }
                 onBlur={field.onBlur}
                 placeholder="(11) 99999-9999"
                 type="tel"
@@ -87,7 +82,7 @@ export function StepDados({ onNext, onBack }: StepDadosProps) {
           <ErrorMsg show={!!errors.cel}>{errors.cel?.message}</ErrorMsg>
         </Field>
 
-        <NavRow onBack={onBack} onNext={handleNext} />
+        <NavRow onBack={onBack} onNext={() => validate(onNext)} />
       </FormCard>
     </CenteredStep>
   );

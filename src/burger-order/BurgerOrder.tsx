@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { motion, AnimatePresence } from "framer-motion";
-import { ProgressBar } from "./components/ui";
+import { AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
+import { ProgressBar, AnimatedStep } from "./components/ui";
 import {
   StepHero,
   StepDados,
@@ -10,9 +10,7 @@ import {
   StepResumo,
   StepConfirmacao,
 } from "./components/steps";
-import { stepVariants } from "./theme";
-import { getGlobalCSS } from "./theme";
-import { genOrderId, fireConfetti, preloadConfetti } from "./utils";
+import { genOrderId, fireConfetti } from "./utils";
 import type { FormData } from "./types";
 
 const TOTAL_STEPS = 4;
@@ -41,18 +39,6 @@ export default function BurgerOrder() {
     mode: "onTouched",
   });
 
-  const formData = form.watch();
-
-  useEffect(() => {
-    const tag = document.createElement("style");
-    tag.textContent = getGlobalCSS();
-    document.head.appendChild(tag);
-    preloadConfetti();
-    return () => {
-      document.head.removeChild(tag);
-    };
-  }, []);
-
   function goTo(n: number): void {
     if (n === 5) fireConfetti();
     setStep(n);
@@ -63,96 +49,57 @@ export default function BurgerOrder() {
     step === 0 ? 0 : step === 5 ? 100 : (step / TOTAL_STEPS) * 100;
 
   return (
-    <FormProvider {...form}>
-      <ProgressBar step={progressPct} total={100} />
+    <LazyMotion features={domAnimation} strict>
+      <FormProvider {...form}>
+        <ProgressBar step={progressPct} total={100} />
 
-      <AnimatePresence mode="wait">
-        {step === 0 && (
-          <motion.div
-            key="hero"
-            variants={stepVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
-            <StepHero onNext={() => goTo(1)} />
-          </motion.div>
-        )}
+        <AnimatePresence mode="wait">
+          {step === 0 && (
+            <AnimatedStep key="hero">
+              <StepHero onNext={() => goTo(1)} />
+            </AnimatedStep>
+          )}
 
-        {step === 1 && (
-          <motion.div
-            key="dados"
-            variants={stepVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
-            <StepDados onNext={() => goTo(2)} onBack={() => goTo(0)} />
-          </motion.div>
-        )}
+          {step === 1 && (
+            <AnimatedStep key="dados">
+              <StepDados onNext={() => goTo(2)} onBack={() => goTo(0)} />
+            </AnimatedStep>
+          )}
 
-        {step === 2 && (
-          <motion.div
-            key="qtd"
-            variants={stepVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
-            <StepQuantidade
-              qtd={qtd}
-              onChange={setQtd}
-              onNext={() => goTo(3)}
-              onBack={() => goTo(1)}
-            />
-          </motion.div>
-        )}
+          {step === 2 && (
+            <AnimatedStep key="qtd">
+              <StepQuantidade
+                qtd={qtd}
+                onChange={setQtd}
+                onNext={() => goTo(3)}
+                onBack={() => goTo(1)}
+              />
+            </AnimatedStep>
+          )}
 
-        {step === 3 && (
-          <motion.div
-            key="entrega"
-            variants={stepVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
-            <StepEntrega onNext={() => goTo(4)} onBack={() => goTo(2)} />
-          </motion.div>
-        )}
+          {step === 3 && (
+            <AnimatedStep key="entrega">
+              <StepEntrega onNext={() => goTo(4)} onBack={() => goTo(2)} />
+            </AnimatedStep>
+          )}
 
-        {step === 4 && (
-          <motion.div
-            key="resumo"
-            variants={stepVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
-            <StepResumo
-              data={formData}
-              qtd={qtd}
-              onNext={() => goTo(5)}
-              onBack={() => goTo(3)}
-            />
-          </motion.div>
-        )}
+          {step === 4 && (
+            <AnimatedStep key="resumo">
+              <StepResumo
+                qtd={qtd}
+                onNext={() => goTo(5)}
+                onBack={() => goTo(3)}
+              />
+            </AnimatedStep>
+          )}
 
-        {step === 5 && (
-          <motion.div
-            key="confirmacao"
-            variants={stepVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
-            <StepConfirmacao
-              data={formData}
-              qtd={qtd}
-              orderId={orderId}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </FormProvider>
+          {step === 5 && (
+            <AnimatedStep key="confirmacao">
+              <StepConfirmacao qtd={qtd} orderId={orderId} />
+            </AnimatedStep>
+          )}
+        </AnimatePresence>
+      </FormProvider>
+    </LazyMotion>
   );
 }

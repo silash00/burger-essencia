@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { ControllerRenderProps } from "react-hook-form";
 import { Controller, useFormContext } from "react-hook-form";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   CenteredStep,
   FormCard,
@@ -13,27 +13,61 @@ import {
   NavRow,
 } from "../ui";
 import { theme } from "../../theme";
-import type { StepEntregaProps, JanelaOption, FormData } from "../../types";
+import { JANELAS } from "../../config";
+import type { StepEntregaProps, FormData } from "../../types";
 import { stepEntregaSchema } from "../../schemas";
+import { useStepValidation } from "../../hooks/useStepValidation";
 import { formatCep, fetchViaCep } from "../../utils";
 
-const JANELAS: JanelaOption[] = [
-  { id: 1, time: "19 — 20h30", label: "1ª janela" },
-  { id: 2, time: "21 — 22h30", label: "2ª janela" },
-];
+const janelaGridStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 16,
+  marginBottom: 8,
+};
+
+const janelaCardStyle: React.CSSProperties = {
+  border: `2px solid ${theme.border}`,
+  borderRadius: 16,
+  padding: "20px 16px",
+  textAlign: "center",
+  cursor: "pointer",
+};
+
+const twoColStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 12,
+};
+
+const spinnerStyle: React.CSSProperties = {
+  width: 20,
+  height: 20,
+  border: `2px solid ${theme.border}`,
+  borderTopColor: theme.orange,
+  borderRadius: "50%",
+};
 
 export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
   const {
     control,
-    getValues,
     setValue,
-    setError,
     clearErrors,
+    setError,
     formState: { errors },
   } = useFormContext<FormData>();
 
   const [loadingCep, setLoadingCep] = useState(false);
   const numeroRef = useRef<HTMLInputElement>(null);
+
+  const validate = useStepValidation(stepEntregaSchema, [
+    "janela",
+    "endereco.cep",
+    "endereco.rua",
+    "endereco.numero",
+    "endereco.bairro",
+    "endereco.cidade",
+  ]);
 
   const lookupCep = useCallback(
     async (cepValue: string) => {
@@ -62,32 +96,6 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
     [setValue, clearErrors, setError],
   );
 
-  function handleNext() {
-    clearErrors([
-      "janela",
-      "endereco.cep",
-      "endereco.rua",
-      "endereco.numero",
-      "endereco.bairro",
-      "endereco.cidade",
-    ]);
-
-    const result = stepEntregaSchema.safeParse({
-      janela: getValues("janela"),
-      endereco: getValues("endereco"),
-    });
-
-    if (!result.success) {
-      for (const issue of result.error.issues) {
-        const path = issue.path.join(".");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setError(path as any, { message: issue.message });
-      }
-      return;
-    }
-    onNext();
-  }
-
   return (
     <CenteredStep>
       <FormCard>
@@ -106,16 +114,9 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
             }: {
               field: ControllerRenderProps<FormData, "janela">;
             }) => (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 16,
-                  marginBottom: 8,
-                }}
-              >
+              <div style={janelaGridStyle}>
                 {JANELAS.map((j) => (
-                  <motion.div
+                  <m.div
                     key={j.id}
                     role="button"
                     tabIndex={0}
@@ -132,7 +133,7 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
                             scale: 1.04,
                             borderColor: theme.orange,
                             background: "rgba(255,107,26,0.12)",
-                            boxShadow: `0 0 24px rgba(255,107,26,0.2)`,
+                            boxShadow: "0 0 24px rgba(255,107,26,0.2)",
                           }
                         : {
                             scale: 1,
@@ -146,14 +147,12 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
                       background: "rgba(255,107,26,0.07)",
                     }}
                     whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    style={{
-                      border: `2px solid ${theme.border}`,
-                      borderRadius: 16,
-                      padding: "20px 16px",
-                      textAlign: "center",
-                      cursor: "pointer",
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 20,
                     }}
+                    style={janelaCardStyle}
                   >
                     <div
                       style={{
@@ -176,7 +175,7 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
                     >
                       {j.label}
                     </div>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             )}
@@ -207,21 +206,17 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
               )}
             />
             {loadingCep && (
-              <motion.div
+              <m.div
                 style={{ position: "absolute", right: 14, top: 14 }}
                 animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 0.8,
+                  ease: "linear",
+                }}
               >
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    border: `2px solid ${theme.border}`,
-                    borderTopColor: theme.orange,
-                    borderRadius: "50%",
-                  }}
-                />
-              </motion.div>
+                <div style={spinnerStyle} />
+              </m.div>
             )}
           </div>
           <ErrorMsg show={!!errors.endereco?.cep}>
@@ -245,13 +240,7 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
             {errors.endereco?.rua?.message}
           </ErrorMsg>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-            }}
-          >
+          <div style={twoColStyle}>
             <div>
               <Controller
                 name="endereco.numero"
@@ -286,13 +275,7 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
             </div>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-            }}
-          >
+          <div style={twoColStyle}>
             <div>
               <Controller
                 name="endereco.bairro"
@@ -334,7 +317,7 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
 
         <NavRow
           onBack={onBack}
-          onNext={handleNext}
+          onNext={() => validate(onNext)}
           nextLabel="VER RESUMO →"
         />
       </FormCard>

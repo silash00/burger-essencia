@@ -9,3 +9,4 @@ export { NavRow } from "./NavRow";
 export { CounterBtn } from "./CounterBtn";
 export { CenteredStep } from "./CenteredStep";
 export { WhatsAppIcon } from "./WhatsAppIcon";
+export { AnimatedStep } from "./AnimatedStep";

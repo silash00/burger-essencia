@@ -7,7 +7,7 @@ export const stepDadosSchema = z.object({
     .string()
     .refine(
       (v: string) => v.replace(/\D/g, "").length >= 10,
-      "Informe um número válido"
+      "Informe um número válido",
     ),
 });
 
@@ -30,17 +30,9 @@ export const stepEntregaSchema = z.object({
   janela: z
     .union([z.literal(1), z.literal(2)])
     .nullable()
-    .refine((v: number | null) => v != null, "Selecione uma janela de entrega"),
+    .refine(
+      (v: number | null) => v != null,
+      "Selecione uma janela de entrega",
+    ),
   endereco: enderecoSchema,
 });
-
-/** Schema completo do formulário (apenas para tipagem e defaultValues) */
-export const formDataSchema = z.object({
-  nome: z.string(),
-  cel: z.string(),
-  janela: z.union([z.literal(1), z.literal(2)]).nullable(),
-  endereco: enderecoSchema,
-});
-
-/** Tipo inferido do formulário (compatível com FormData) */
-export type FormDataSchema = z.infer<typeof formDataSchema>;

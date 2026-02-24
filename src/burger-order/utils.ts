@@ -1,10 +1,11 @@
-import confetti from "canvas-confetti";
+import type { Options as ConfettiOptions } from "canvas-confetti";
 import { theme } from "./theme";
-import type { Endereco } from "./types";
+import type { Endereco, ViaCepResponse } from "./types";
 
 export function formatPhone(raw: string): string {
   const v = raw.replace(/\D/g, "").slice(0, 11);
-  if (v.length > 7) return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+  if (v.length > 7)
+    return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
   if (v.length > 2) return `(${v.slice(0, 2)}) ${v.slice(2)}`;
   return v;
 }
@@ -14,22 +15,16 @@ export function genOrderId(): string {
 }
 
 export function formatBRL(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
 export function formatCep(raw: string): string {
   const v = raw.replace(/\D/g, "").slice(0, 8);
   if (v.length > 5) return `${v.slice(0, 5)}-${v.slice(5)}`;
   return v;
-}
-
-interface ViaCepResponse {
-  logradouro: string;
-  complemento: string;
-  bairro: string;
-  localidade: string;
-  uf: string;
-  erro?: boolean;
 }
 
 export async function fetchViaCep(
@@ -61,31 +56,29 @@ export function formatEndereco(e: Endereco): string {
   return str;
 }
 
-const cannon = confetti.create(undefined, {
-  useWorker: true,
-  resize: true,
-});
-
-const COUNT = 200;
-const DEFAULTS: confetti.Options = {
+const CONFETTI_COUNT = 200;
+const CONFETTI_DEFAULTS: ConfettiOptions = {
   origin: { x: 0.5, y: 0.3 },
   zIndex: 10000,
   colors: [theme.orange, theme.yellow, theme.red, theme.cream],
 };
 
-function fire(particleRatio: number, opts: confetti.Options): void {
-  cannon({
-    ...DEFAULTS,
-    ...opts,
-    particleCount: Math.floor(COUNT * particleRatio),
+/** Dispara confetti em múltiplas rajadas simultâneas (carregado sob demanda). */
+export async function fireConfetti(): Promise<void> {
+  const { default: confetti } = await import("canvas-confetti");
+  const cannon = confetti.create(undefined, {
+    useWorker: true,
+    resize: true,
   });
-}
 
-/** Noop — mantido para compatibilidade, mas não há mais script externo. */
-export function preloadConfetti(): void {}
+  function fire(ratio: number, opts: ConfettiOptions): void {
+    cannon({
+      ...CONFETTI_DEFAULTS,
+      ...opts,
+      particleCount: Math.floor(CONFETTI_COUNT * ratio),
+    });
+  }
 
-/** Dispara confetti em múltiplas rajadas simultâneas para efeito mais fluido. */
-export function fireConfetti(): void {
   fire(0.25, { spread: 26, startVelocity: 55 });
   fire(0.2, { spread: 60 });
   fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });

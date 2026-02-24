@@ -1,47 +1,83 @@
-import { motion } from "framer-motion";
-import { theme } from "../../theme";
+import { m } from "framer-motion";
+import { theme, stagger, fadeUp } from "../../theme";
 import { CONFIG } from "../../config";
-import { stagger, fadeUp } from "../../theme";
+import { useEnterKey } from "../../hooks/useEnterKey";
 
 interface StepHeroProps {
   onNext: () => void;
 }
 
+const containerStyle: React.CSSProperties = {
+  textAlign: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 0,
+  background: `
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(230,51,18,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,107,26,0.1) 0%, transparent 60%)
+  `,
+  minHeight: "100vh",
+  justifyContent: "center",
+  padding: "80px 24px 40px",
+};
+
+const badgeStyle: React.CSSProperties = {
+  marginTop: 24,
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  background: "rgba(255,202,40,0.1)",
+  border: "1px solid rgba(255,202,40,0.3)",
+  borderRadius: 999,
+  padding: "8px 20px",
+  fontSize: 13,
+  fontWeight: 700,
+  color: theme.yellow,
+};
+
+const ctaBtnStyle: React.CSSProperties = {
+  marginTop: 40,
+  padding: "18px 48px",
+  background: `linear-gradient(135deg, ${theme.red}, ${theme.orange})`,
+  color: "white",
+  fontFamily: "'Bebas Neue', sans-serif",
+  fontSize: 22,
+  letterSpacing: 2,
+  border: "none",
+  borderRadius: 16,
+  cursor: "pointer",
+};
+
 export function StepHero({ onNext }: StepHeroProps) {
+  useEnterKey(onNext);
+
   return (
-    <motion.div
+    <m.div
       variants={stagger}
       initial="initial"
       animate="animate"
-      style={{
-        textAlign: "center",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 0,
-        background: `
-          radial-gradient(ellipse 80% 60% at 50% 0%, rgba(230,51,18,0.18) 0%, transparent 70%),
-          radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,107,26,0.1) 0%, transparent 60%)
-        `,
-        minHeight: "100vh",
-        justifyContent: "center",
-        padding: "80px 24px 40px",
-      }}
+      style={containerStyle}
     >
-      <motion.span
+      <m.span
         initial={{ opacity: 0, y: -80, scale: 0.6, rotate: -10 }}
         animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-        transition={{ type: "spring", stiffness: 220, damping: 14, delay: 0.2 }}
+        transition={{
+          type: "spring",
+          stiffness: 220,
+          damping: 14,
+          delay: 0.2,
+        }}
         style={{
           fontSize: 96,
           display: "block",
-          filter: `drop-shadow(0 12px 32px rgba(255,107,26,0.5))`,
+          filter: "drop-shadow(0 12px 32px rgba(255,107,26,0.5))",
         }}
       >
         🍔
-      </motion.span>
+      </m.span>
 
-      <motion.h1
+      <m.h1
         variants={fadeUp}
         transition={{ delay: 0.5 }}
         style={{
@@ -55,9 +91,9 @@ export function StepHero({ onNext }: StepHeroProps) {
         Burger
         <br />
         <span style={{ color: theme.orange }}>Night</span>
-      </motion.h1>
+      </m.h1>
 
-      <motion.p
+      <m.p
         variants={fadeUp}
         transition={{ delay: 0.65 }}
         style={{
@@ -70,38 +106,22 @@ export function StepHero({ onNext }: StepHeroProps) {
         }}
       >
         {CONFIG.churchName} · {CONFIG.eventDate}
-      </motion.p>
+      </m.p>
 
-      <motion.div
-        variants={fadeUp}
-        transition={{ delay: 0.8 }}
-        style={{
-          marginTop: 24,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 8,
-          background: "rgba(255,202,40,0.1)",
-          border: "1px solid rgba(255,202,40,0.3)",
-          borderRadius: 999,
-          padding: "8px 20px",
-          fontSize: 13,
-          fontWeight: 700,
-          color: theme.yellow,
-        }}
-      >
+      <m.div variants={fadeUp} transition={{ delay: 0.8 }} style={badgeStyle}>
         🕯️ Uma noite de comida &amp; comunidade
-      </motion.div>
+      </m.div>
 
-      <motion.button
+      <m.button
         type="button"
         variants={fadeUp}
         transition={{ delay: 1 }}
         onClick={onNext}
         animate={{
           boxShadow: [
-            `0 8px 32px rgba(230,51,18,0.4)`,
-            `0 8px 48px rgba(230,51,18,0.7)`,
-            `0 8px 32px rgba(230,51,18,0.4)`,
+            "0 8px 32px rgba(230,51,18,0.4)",
+            "0 8px 48px rgba(230,51,18,0.7)",
+            "0 8px 32px rgba(230,51,18,0.4)",
           ],
           transition: {
             duration: 2.5,
@@ -111,21 +131,10 @@ export function StepHero({ onNext }: StepHeroProps) {
         }}
         whileHover={{ y: -3, scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
-        style={{
-          marginTop: 40,
-          padding: "18px 48px",
-          background: `linear-gradient(135deg, ${theme.red}, ${theme.orange})`,
-          color: "white",
-          fontFamily: "'Bebas Neue', sans-serif",
-          fontSize: 22,
-          letterSpacing: 2,
-          border: "none",
-          borderRadius: 16,
-          cursor: "pointer",
-        }}
+        style={ctaBtnStyle}
       >
         FAZER MEU PEDIDO →
-      </motion.button>
-    </motion.div>
+      </m.button>
+    </m.div>
   );
 }

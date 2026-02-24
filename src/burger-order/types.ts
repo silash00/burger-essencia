@@ -30,7 +30,17 @@ export interface ResumoItem {
   isTotal?: boolean;
 }
 
-/** Props dos steps de formulário (dados vêm do FormProvider) */
+/** Resposta da API ViaCEP */
+export interface ViaCepResponse {
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  erro?: boolean;
+}
+
+/** Props dos steps de formulário */
 export interface StepDadosProps {
   onNext: () => void;
   onBack: () => void;
@@ -49,14 +59,12 @@ export interface StepEntregaProps {
 }
 
 export interface StepResumoProps {
-  data: FormData;
   qtd: number;
   onNext: () => void;
   onBack: () => void;
 }
 
 export interface StepConfirmacaoProps {
-  data: FormData;
   qtd: number;
   orderId: string;
 }
