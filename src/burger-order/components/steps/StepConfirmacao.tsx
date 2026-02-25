@@ -35,19 +35,30 @@ const whatsappBtnStyle: React.CSSProperties = {
   boxShadow: "0 8px 24px rgba(37,211,102,0.3)",
 };
 
-export function StepConfirmacao({ qtd, orderId }: StepConfirmacaoProps) {
+export function StepConfirmacao({ qtd, orderId, onRestart }: StepConfirmacaoProps) {
   const { getValues } = useFormContext<FormData>();
   const data = getValues();
   const total = formatBRL(qtd * CONFIG.preco);
+
+  const localLabel = data.retirada
+    ? "Retirada no local"
+    : formatEndereco(data.endereco);
+
+  const pagLabel = data.pagDinheiro ? "Dinheiro" : "Pix";
+
+  const msgSuffix = data.pagDinheiro
+    ? "Vou pagar em dinheiro na entrega! 💵"
+    : "Segue o comprovante do Pix! 👆";
 
   const msg = encodeURIComponent(
     `🍔 *Burger Night - Pedido ${orderId}*\n\n` +
       `👤 Nome: ${data.nome}\n` +
       `📦 Combos: ${qtd}x\n` +
       `⏰ Janela: ${getJanelaLabel(data.janela)}\n` +
-      `📍 Endereço: ${formatEndereco(data.endereco)}\n` +
+      `📍 Endereço: ${localLabel}\n` +
+      `💳 Pagamento: ${pagLabel}\n` +
       `💰 Total: ${total}\n\n` +
-      `Segue o comprovante do Pix! 👆`,
+      msgSuffix,
   );
 
   return (
@@ -124,9 +135,19 @@ export function StepConfirmacao({ qtd, orderId }: StepConfirmacaoProps) {
               lineHeight: 1.6,
             }}
           >
-            Agora envie o comprovante do Pix no WhatsApp abaixo.
-            <br />
-            Seu lanche estará te esperando! 🙏
+            {data.pagDinheiro ? (
+              <>
+                Confirme seu pedido no WhatsApp abaixo.
+                <br />
+                Tenha o valor de {total} em mãos! 💵
+              </>
+            ) : (
+              <>
+                Agora envie o comprovante do Pix no WhatsApp abaixo.
+                <br />
+                Seu lanche estará te esperando! 🙏
+              </>
+            )}
           </m.p>
 
           <m.a
@@ -142,7 +163,7 @@ export function StepConfirmacao({ qtd, orderId }: StepConfirmacaoProps) {
             style={whatsappBtnStyle}
           >
             <WhatsAppIcon />
-            ENVIAR COMPROVANTE
+            {data.pagDinheiro ? "CONFIRMAR NO WHATSAPP" : "ENVIAR COMPROVANTE"}
           </m.a>
 
           <m.p
@@ -157,6 +178,27 @@ export function StepConfirmacao({ qtd, orderId }: StepConfirmacaoProps) {
             Número do pedido:{" "}
             <span style={{ color: theme.orange }}>{orderId}</span>
           </m.p>
+
+          <m.button
+            type="button"
+            variants={fadeUp}
+            onClick={onRestart}
+            whileHover={{ color: theme.cream }}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              marginTop: 32,
+              background: "none",
+              border: "none",
+              color: theme.muted,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              textDecoration: "underline",
+              textUnderlineOffset: 3,
+            }}
+          >
+            Iniciar novo pedido
+          </m.button>
         </m.div>
       </FormCard>
     </CenteredStep>

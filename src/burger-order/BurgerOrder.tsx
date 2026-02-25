@@ -18,6 +18,8 @@ const TOTAL_STEPS = 4;
 const initialFormData: FormData = {
   nome: "",
   cel: "",
+  retirada: false,
+  pagDinheiro: false,
   janela: null,
   endereco: {
     cep: "",
@@ -43,6 +45,12 @@ export default function BurgerOrder() {
     if (n === 5) fireConfetti();
     setStep(n);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function restart(): void {
+    form.reset(initialFormData);
+    setQtd(1);
+    goTo(0);
   }
 
   const progressPct =
@@ -95,7 +103,7 @@ export default function BurgerOrder() {
 
           {step === 5 && (
             <AnimatedStep key="confirmacao">
-              <StepConfirmacao qtd={qtd} orderId={orderId} />
+              <StepConfirmacao qtd={qtd} orderId={orderId} onRestart={restart} />
             </AnimatedStep>
           )}
         </AnimatePresence>

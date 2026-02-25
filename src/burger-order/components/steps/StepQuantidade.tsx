@@ -16,7 +16,7 @@ import type { StepQuantidadeProps } from "../../types";
 const burgersRowStyle: React.CSSProperties = {
   display: "flex",
   flexWrap: "wrap",
-  gap: 6,
+  gap: 16,
   justifyContent: "center",
   minHeight: 36,
   marginBottom: 8,
@@ -82,9 +82,39 @@ export function StepQuantidade({
                   damping: 18,
                   delay: i * 0.03,
                 }}
-                style={{ fontSize: 24 }}
+                style={{
+                  display: "inline-flex",
+                  position: "relative",
+                  width: 38,
+                  height: 32,
+                  fontSize: 22,
+                }}
               >
-                🍔
+                <span
+                  style={{
+                    position: "absolute",
+                    left: "-4px",
+                    top: "-4px",
+                    zIndex: 1,
+                  }}
+                >
+                  🍟
+                </span>
+                <span
+                  style={{ position: "absolute", left: 8, top: 0, zIndex: 2 }}
+                >
+                  🍔
+                </span>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 20,
+                    top: "-4px",
+                    zIndex: 1,
+                  }}
+                >
+                  🥤
+                </span>
               </m.span>
             ))}
             {qtd > 10 && (

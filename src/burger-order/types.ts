@@ -12,6 +12,8 @@ export interface Endereco {
 export interface FormData {
   nome: string;
   cel: string;
+  retirada: boolean;
+  pagDinheiro: boolean;
   janela: number | null;
   endereco: Endereco;
 }
@@ -67,4 +69,5 @@ export interface StepResumoProps {
 export interface StepConfirmacaoProps {
   qtd: number;
   orderId: string;
+  onRestart: () => void;
 }
