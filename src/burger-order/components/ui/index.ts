@@ -6,6 +6,7 @@ export { Field } from "./Field";
 export { Input } from "./Input";
 export { ErrorMsg } from "./ErrorMsg";
 export { NavRow } from "./NavRow";
+export { Spinner } from "./Spinner";
 export { CounterBtn } from "./CounterBtn";
 export { CenteredStep } from "./CenteredStep";
 export { WhatsAppIcon } from "./WhatsAppIcon";

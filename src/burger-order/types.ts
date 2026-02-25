@@ -62,6 +62,7 @@ export interface StepEntregaProps {
 
 export interface StepResumoProps {
   qtd: number;
+  orderId: string;
   onNext: () => void;
   onBack: () => void;
 }

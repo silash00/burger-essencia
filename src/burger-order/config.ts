@@ -2,10 +2,14 @@ import type { JanelaOption } from "./types";
 
 export const CONFIG = {
   preco: 35,
-  pixKey: "icp-osasco@gmail.com",
-  whatsappNum: "5511999999999",
-  eventDate: "7 de Março, 2025",
-  churchName: "ICP Osasco",
+  pixKey: import.meta.env.VITE_PIX_KEY,
+  pixMerchantName: import.meta.env.VITE_PIX_MERCHANT_NAME,
+  pixMerchantCity: import.meta.env.VITE_PIX_MERCHANT_CITY,
+  whatsappNum: import.meta.env.VITE_WHATSAPP_NUM,
+  eventDate: import.meta.env.VITE_EVENT_DATE,
+  churchName: import.meta.env.VITE_CHURCH_NAME,
+  googleSheetToken: import.meta.env.VITE_GOOGLE_SHEET_TOKEN,
+  googleSheetUrl: import.meta.env.VITE_GOOGLE_SHEET_URL,
 } as const;
 
 export const JANELAS: JanelaOption[] = [

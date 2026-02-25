@@ -17,6 +17,15 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_PIX_KEY: ${{ secrets.VITE_PIX_KEY }}
+      VITE_PIX_MERCHANT_NAME: ${{ secrets.VITE_PIX_MERCHANT_NAME }}
+      VITE_PIX_MERCHANT_CITY: ${{ secrets.VITE_PIX_MERCHANT_CITY }}
+      VITE_WHATSAPP_NUM: ${{ secrets.VITE_WHATSAPP_NUM }}
+      VITE_EVENT_DATE: ${{ secrets.VITE_EVENT_DATE }}
+      VITE_CHURCH_NAME: ${{ secrets.VITE_CHURCH_NAME }}
+      VITE_GOOGLE_SHEET_TOKEN: ${{ secrets.VITE_GOOGLE_SHEET_TOKEN }}
+      VITE_GOOGLE_SHEET_URL: ${{ secrets.VITE_GOOGLE_SHEET_URL }}
     steps:
       - uses: actions/checkout@v4
 

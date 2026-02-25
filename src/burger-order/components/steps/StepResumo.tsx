@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { useFormContext, useWatch } from "react-hook-form";
-import { CenteredStep, FormCard, StepLabel, StepTitle, NavRow } from "../ui";
+import { CenteredStep, FormCard, StepLabel, StepTitle, NavRow, Spinner } from "../ui";
 import { theme, stagger, fadeUp } from "../../theme";
 import { CONFIG, getJanelaLabel } from "../../config";
-import { formatBRL, formatEndereco } from "../../utils";
+import { formatBRL, formatEndereco, generatePixCopiaECola } from "../../utils";
+import { submitOrderToSheet } from "../../service";
 import type { StepResumoProps, ResumoItem, FormData } from "../../types";
 
 const itemLabelStyle: React.CSSProperties = {
@@ -56,15 +57,35 @@ const dinheiroBtnStyle: React.CSSProperties = {
   marginTop: 12,
 };
 
-export function StepResumo({ qtd, onNext, onBack }: StepResumoProps) {
+export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
   const { getValues, setValue, control } = useFormContext<FormData>();
   const data = getValues();
   const [copied, setCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const pagDinheiro = useWatch({ control, name: "pagDinheiro" });
   const total = qtd * CONFIG.preco;
 
+  async function handleConfirm() {
+    setSubmitting(true);
+    try {
+      await submitOrderToSheet(data, orderId, qtd);
+    } catch {
+      // Falha silenciosa — o pedido via WhatsApp continua funcionando
+    } finally {
+      setSubmitting(false);
+      onNext();
+    }
+  }
+
   function copyPix() {
-    navigator.clipboard.writeText(CONFIG.pixKey);
+    const payload = generatePixCopiaECola(
+      CONFIG.pixKey,
+      total,
+      CONFIG.pixMerchantName,
+      CONFIG.pixMerchantCity,
+      orderId,
+    );
+    navigator.clipboard.writeText(payload);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   }
@@ -193,7 +214,7 @@ export function StepResumo({ qtd, onNext, onBack }: StepResumoProps) {
                     marginBottom: 4,
                   }}
                 >
-                  Chave Pix
+                  Pix Copia e Cola
                 </p>
                 <div style={pixKeyStyle}>{CONFIG.pixKey}</div>
                 <p
@@ -203,7 +224,9 @@ export function StepResumo({ qtd, onNext, onBack }: StepResumoProps) {
                     marginBottom: 12,
                   }}
                 >
-                  Transfira {formatBRL(total)} para confirmar o pedido
+                  Cole no app do banco — o valor de{" "}
+                  <strong style={{ color: theme.cream }}>{formatBRL(total)}</strong>{" "}
+                  já estará preenchido
                 </p>
                 <m.button
                   type="button"
@@ -225,7 +248,7 @@ export function StepResumo({ qtd, onNext, onBack }: StepResumoProps) {
                   whileTap={{ scale: 0.97 }}
                   style={pixBtnStyle}
                 >
-                  {copied ? "✓ COPIADO!" : "📋 COPIAR CHAVE PIX"}
+                  {copied ? "✓ COPIADO!" : "📋 COPIAR PIX COPIA E COLA"}
                 </m.button>
               </m.div>
 
@@ -252,8 +275,19 @@ export function StepResumo({ qtd, onNext, onBack }: StepResumoProps) {
 
         <NavRow
           onBack={onBack}
-          onNext={onNext}
-          nextLabel={pagDinheiro ? "CONFIRMAR PEDIDO 🎉" : "JÁ PAGUEI! 🎉"}
+          onNext={handleConfirm}
+          nextLabel={
+            submitting ? (
+              <>
+                <Spinner size={16} /> ENVIANDO...
+              </>
+            ) : pagDinheiro ? (
+              "CONFIRMAR PEDIDO 🎉"
+            ) : (
+              "JÁ PAGUEI! 🎉"
+            )
+          }
+          nextDisabled={submitting}
         />
       </FormCard>
     </CenteredStep>

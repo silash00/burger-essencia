@@ -4,14 +4,31 @@ import type { Endereco, ViaCepResponse } from "./types";
 
 export function formatPhone(raw: string): string {
   const v = raw.replace(/\D/g, "").slice(0, 11);
-  if (v.length > 7)
-    return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+  if (v.length > 7) return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
   if (v.length > 2) return `(${v.slice(0, 2)}) ${v.slice(2)}`;
   return v;
 }
 
+const ORDER_ID_KEY = "burger-order-counter";
+const DEVICE_PREFIX_KEY = "burger-device-prefix";
+
+function getOrCreateDevicePrefix(): string {
+  let prefix = localStorage.getItem(DEVICE_PREFIX_KEY);
+  if (!prefix) {
+    const arr = new Uint8Array(1);
+    crypto.getRandomValues(arr);
+    prefix = (arr[0] % 100).toString().padStart(2, "0");
+    localStorage.setItem(DEVICE_PREFIX_KEY, prefix);
+  }
+  return prefix;
+}
+
 export function genOrderId(): string {
-  return "BN" + Date.now().toString().slice(-5);
+  const devicePrefix = getOrCreateDevicePrefix();
+  const n = parseInt(localStorage.getItem(ORDER_ID_KEY) ?? "0", 10) + 1;
+  localStorage.setItem(ORDER_ID_KEY, String(n));
+  const counter = ((n - 1) % 99 + 1).toString().padStart(2, "0");
+  return "BN" + devicePrefix + counter;
 }
 
 export function formatBRL(value: number): string {
@@ -55,6 +72,54 @@ export function formatEndereco(e: Endereco): string {
   if (e.cidade) str += ` — ${e.cidade}`;
   return str;
 }
+
+/* ── PIX Copia e Cola (BR Code – EMV QR Merchant Presented Mode) ── */
+
+function tlv(id: string, value: string): string {
+  return id + value.length.toString().padStart(2, "0") + value;
+}
+
+function crc16Ccitt(payload: string): string {
+  let crc = 0xffff;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+      crc &= 0xffff;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+export function generatePixCopiaECola(
+  pixKey: string,
+  amount: number,
+  merchantName: string,
+  merchantCity: string,
+  txId = "***",
+): string {
+  const merchantAccount = tlv(
+    "26",
+    tlv("00", "br.gov.bcb.pix") + tlv("01", pixKey),
+  );
+
+  let payload = "";
+  payload += tlv("00", "01");
+  payload += tlv("01", "12");
+  payload += merchantAccount;
+  payload += tlv("52", "0000");
+  payload += tlv("53", "986");
+  payload += tlv("54", amount.toFixed(2));
+  payload += tlv("58", "BR");
+  payload += tlv("59", merchantName.slice(0, 25));
+  payload += tlv("60", merchantCity.slice(0, 15));
+  payload += tlv("62", tlv("05", txId));
+  payload += "6304";
+
+  return payload + crc16Ccitt(payload);
+}
+
+/* ── Confetti ── */
 
 const CONFETTI_COUNT = 200;
 const CONFETTI_DEFAULTS: ConfettiOptions = {

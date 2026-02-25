@@ -33,7 +33,7 @@ const initialFormData: FormData = {
 
 export default function BurgerOrder() {
   const [step, setStep] = useState(0);
-  const [orderId] = useState(genOrderId);
+  const [orderId, setOrderId] = useState(genOrderId);
   const [qtd, setQtd] = useState(1);
 
   const form = useForm<FormData>({
@@ -50,6 +50,7 @@ export default function BurgerOrder() {
   function restart(): void {
     form.reset(initialFormData);
     setQtd(1);
+    setOrderId(genOrderId());
     goTo(0);
   }
 
@@ -95,6 +96,7 @@ export default function BurgerOrder() {
             <AnimatedStep key="resumo">
               <StepResumo
                 qtd={qtd}
+                orderId={orderId}
                 onNext={() => goTo(5)}
                 onBack={() => goTo(3)}
               />

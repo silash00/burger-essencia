@@ -6,8 +6,10 @@ import { useEffect } from "react";
  * se a tecla está sendo segurada (repeat), ou se o foco
  * está em um elemento que trata Enter nativamente.
  */
-export function useEnterKey(callback: () => void) {
+export function useEnterKey(callback: (() => void) | undefined) {
   useEffect(() => {
+    if (!callback) return;
+
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key !== "Enter" || e.repeat || e.defaultPrevented) return;
 
@@ -15,7 +17,7 @@ export function useEnterKey(callback: () => void) {
       if (tag === "BUTTON" || tag === "A" || tag === "TEXTAREA") return;
 
       e.preventDefault();
-      callback();
+      callback?.();
     }
 
     window.addEventListener("keydown", handleKeyDown);

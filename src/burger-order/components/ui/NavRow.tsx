@@ -5,8 +5,9 @@ import { useEnterKey } from "../../hooks/useEnterKey";
 interface NavRowProps {
   onBack?: () => void;
   onNext: () => void;
-  nextLabel?: string;
+  nextLabel?: React.ReactNode;
   backLabel?: string;
+  nextDisabled?: boolean;
 }
 
 const rowStyle: React.CSSProperties = {
@@ -48,8 +49,9 @@ export function NavRow({
   onNext,
   nextLabel = "PRÓXIMO →",
   backLabel = "← Voltar",
+  nextDisabled = false,
 }: NavRowProps) {
-  useEnterKey(onNext);
+  useEnterKey(nextDisabled ? undefined : onNext);
 
   return (
     <div style={rowStyle}>
@@ -66,10 +68,17 @@ export function NavRow({
       )}
       <m.button
         type="button"
-        onClick={onNext}
-        whileHover={{ y: -2, boxShadow: `0 8px 28px rgba(230,51,18,0.5)` }}
-        whileTap={{ scale: 0.97 }}
-        style={nextBtnStyle}
+        onClick={nextDisabled ? undefined : onNext}
+        whileHover={
+          nextDisabled
+            ? {}
+            : { y: -2, boxShadow: `0 8px 28px rgba(230,51,18,0.5)` }
+        }
+        whileTap={nextDisabled ? {} : { scale: 0.97 }}
+        style={{
+          ...nextBtnStyle,
+          ...(nextDisabled ? { opacity: 0.6, cursor: "not-allowed" } : {}),
+        }}
       >
         {nextLabel}
       </m.button>
