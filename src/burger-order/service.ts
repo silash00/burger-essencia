@@ -17,7 +17,7 @@ export async function submitOrderToSheet(
       ? "Retirada no local"
       : `${data.endereco.rua}, ${data.endereco.numero} - ${data.endereco.bairro}, ${data.endereco.cidade}`,
     pagamento: data.pagDinheiro ? "Dinheiro" : "PIX",
-    total: `R$ ${(quantidade * CONFIG.preco).toFixed(2)}`,
+    total: quantidade * CONFIG.preco,
   };
 
   const url = `${CONFIG.googleSheetUrl}?token=${CONFIG.googleSheetToken}`;
