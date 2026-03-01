@@ -10,7 +10,8 @@ const msgStyle: React.CSSProperties = {
   color: theme.error,
   fontSize: 13,
   fontWeight: 700,
-  marginBottom: 12,
+  margin: "12px 0",
+  textAlign: "center",
 };
 
 export function ErrorMsg({ show, children }: ErrorMsgProps) {

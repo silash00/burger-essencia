@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { useFormContext, useWatch } from "react-hook-form";
-import { CenteredStep, FormCard, StepLabel, StepTitle, NavRow, Spinner } from "../ui";
+import {
+  CenteredStep,
+  FormCard,
+  StepLabel,
+  StepTitle,
+  NavRow,
+  Spinner,
+  ErrorMsg,
+} from "../ui";
 import { theme, stagger, fadeUp } from "../../theme";
 import { CONFIG, getJanelaLabel } from "../../config";
 import { formatBRL, formatEndereco, generatePixCopiaECola } from "../../utils";
@@ -62,18 +70,24 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
   const data = getValues();
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const pagDinheiro = useWatch({ control, name: "pagDinheiro" });
   const total = qtd * CONFIG.preco;
 
   async function handleConfirm() {
+    setSubmitError(null);
     setSubmitting(true);
     try {
       await submitOrderToSheet(data, orderId, qtd);
-    } catch {
-      // Falha silenciosa — o pedido via WhatsApp continua funcionando
+      onNext();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Erro ao enviar. Tente novamente ou confirme pelo WhatsApp.";
+      setSubmitError(message);
     } finally {
       setSubmitting(false);
-      onNext();
     }
   }
 
@@ -225,7 +239,9 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
                   }}
                 >
                   Cole no app do banco — o valor de{" "}
-                  <strong style={{ color: theme.cream }}>{formatBRL(total)}</strong>{" "}
+                  <strong style={{ color: theme.cream }}>
+                    {formatBRL(total)}
+                  </strong>{" "}
                   já estará preenchido
                 </p>
                 <m.button
@@ -272,6 +288,8 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
             </m.div>
           )}
         </AnimatePresence>
+
+        <ErrorMsg show={!!submitError}>{submitError}</ErrorMsg>
 
         <NavRow
           onBack={onBack}

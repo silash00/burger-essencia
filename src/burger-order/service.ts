@@ -26,5 +26,11 @@ export async function submitOrderToSheet(
     body: JSON.stringify(payload),
   });
 
+  if (!res.ok) {
+    throw new Error(
+      `Falha ao enviar pedido (${res.status}). Tente novamente ou confirme pelo WhatsApp.`,
+    );
+  }
+
   return res.json();
 }
