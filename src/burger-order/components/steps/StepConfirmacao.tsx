@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { CenteredStep, FormCard, WhatsAppIcon } from "../ui";
 import { theme, stagger, fadeUp } from "../../theme";
 import { CONFIG, getJanelaLabel } from "../../config";
-import { formatBRL, formatEndereco } from "../../utils";
+import { formatBRL, formatBRLForUrl, formatEndereco, normalizeForWhatsAppUrl } from "../../utils";
 import type { StepConfirmacaoProps, FormData } from "../../types";
 
 const successCircleStyle: React.CSSProperties = {
@@ -50,16 +50,16 @@ export function StepConfirmacao({ qtd, orderId, onRestart }: StepConfirmacaoProp
     ? "Vou pagar em dinheiro na entrega! 💵"
     : "Segue o comprovante do Pix! 👆";
 
-  const msg = encodeURIComponent(
+  const msgRaw =
     `🍔 *Burger Night - Pedido ${orderId}*\n\n` +
-      `👤 Nome: ${data.nome}\n` +
-      `📦 Combos: ${qtd}x\n` +
-      `⏰ Janela: ${getJanelaLabel(data.janela)}\n` +
-      `📍 Endereço: ${localLabel}\n` +
-      `💳 Pagamento: ${pagLabel}\n` +
-      `💰 Total: ${total}\n\n` +
-      msgSuffix,
-  );
+    `👤 Nome: ${normalizeForWhatsAppUrl(data.nome)}\n` +
+    `📦 Combos: ${qtd}x\n` +
+    `⏰ Janela: ${normalizeForWhatsAppUrl(getJanelaLabel(data.janela))}\n` +
+    `📍 Endereço: ${normalizeForWhatsAppUrl(localLabel)}\n` +
+    `💳 Pagamento: ${pagLabel}\n` +
+    `💰 Total: ${formatBRLForUrl(qtd * CONFIG.preco)}\n\n` +
+    msgSuffix;
+  const msg = encodeURIComponent(msgRaw);
 
   return (
     <CenteredStep>

@@ -38,6 +38,18 @@ export function formatBRL(value: number): string {
   });
 }
 
+/** Formato seguro para URLs (evita Unicode de toLocaleString que quebra encoding) */
+export function formatBRLForUrl(value: number): string {
+  return `R$ ${value.toFixed(2).replace(".", ",")}`;
+}
+
+/** Normaliza texto para uso em URL do WhatsApp (evita caracteres que quebram encoding) */
+export function normalizeForWhatsAppUrl(str: string): string {
+  return str
+    .replace(/\u202F/g, " ") // narrow no-break space → espaço
+    .replace(/\u2014/g, "-"); // em dash → hífen
+}
+
 export function formatCep(raw: string): string {
   const v = raw.replace(/\D/g, "").slice(0, 8);
   if (v.length > 5) return `${v.slice(0, 5)}-${v.slice(5)}`;
