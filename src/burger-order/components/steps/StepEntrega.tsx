@@ -163,12 +163,9 @@ export function StepEntrega({ onNext, onBack }: StepEntregaProps) {
         <Field label="Período de entrega">
           <div style={infoStyle}>
             <p>
-              O seu pedido deverá ser <b>entregue</b> durante o período
-              selecionado.
-            </p>
-            <p>
-              Se preferir, você pode <b>retirar</b> o pedido no local durante o
-              período selecionado.
+              Escolha o <b>período</b> em que deseja receber ou retirar seu
+              pedido. Você pode optar por <b>entrega</b> no endereço informado
+              ou <b>retirada</b> no local.
             </p>
           </div>
           <Controller
