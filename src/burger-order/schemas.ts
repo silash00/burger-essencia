@@ -6,8 +6,11 @@ export const stepDadosSchema = z.object({
   cel: z
     .string()
     .refine(
-      (v: string) => v.replace(/\D/g, "").length >= 10,
-      "Informe um número válido",
+      (v: string) => {
+        const digits = v.replace(/\D/g, "");
+        return digits.length === 11 && digits[2] === "9";
+      },
+      "Informe o celular com DDD + 9 dígitos (ex: 11 99999-9999)",
     ),
 });
 

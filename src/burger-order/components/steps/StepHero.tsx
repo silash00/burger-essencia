@@ -90,7 +90,9 @@ export function StepHero({ onNext }: StepHeroProps) {
       >
         {CONFIG.displayName.split(" ")[0]}
         <br />
-        <span style={{ color: theme.orange }}>{CONFIG.displayName.split(" ")[1]}</span>
+        <span style={{ color: theme.orange }}>
+          {CONFIG.displayName.split(" ")[1]}
+        </span>
       </m.h1>
 
       <m.p

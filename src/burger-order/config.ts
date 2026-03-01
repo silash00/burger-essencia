@@ -14,8 +14,8 @@ export const CONFIG = {
 } as const;
 
 export const JANELAS: JanelaOption[] = [
-  { id: 1, time: "19 — 20h30", label: "1ª janela" },
-  { id: 2, time: "21 — 22h30", label: "2ª janela" },
+  { id: 1, time: "19h — 20h30", label: "1ª janela" },
+  { id: 2, time: "21h — 22h30", label: "2ª janela" },
 ];
 
 export function getJanelaLabel(id: number | null): string {

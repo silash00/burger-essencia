@@ -2,6 +2,7 @@ import type { Options as ConfettiOptions } from "canvas-confetti";
 import { theme } from "./theme";
 import type { Endereco, ViaCepResponse } from "./types";
 
+/** Formata celular brasileiro: DDD (2) + 9 dígitos = 11 total. Ex: (11) 99999-9999 */
 export function formatPhone(raw: string): string {
   const v = raw.replace(/\D/g, "").slice(0, 11);
   if (v.length > 7) return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
