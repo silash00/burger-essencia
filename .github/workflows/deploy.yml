@@ -18,6 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      VITE_SITE_URL: ${{ secrets.VITE_SITE_URL }}
       VITE_PIX_KEY: ${{ secrets.VITE_PIX_KEY }}
       VITE_PIX_MERCHANT_NAME: ${{ secrets.VITE_PIX_MERCHANT_NAME }}
       VITE_PIX_MERCHANT_CITY: ${{ secrets.VITE_PIX_MERCHANT_CITY }}
