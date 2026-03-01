@@ -1,6 +1,7 @@
 import type { JanelaOption } from "./types";
 
 export const CONFIG = {
+  displayName: "Essencia Burguer",
   preco: 35,
   pixKey: import.meta.env.VITE_PIX_KEY,
   pixMerchantName: import.meta.env.VITE_PIX_MERCHANT_NAME,

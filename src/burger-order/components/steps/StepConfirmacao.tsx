@@ -51,7 +51,7 @@ export function StepConfirmacao({ qtd, orderId, onRestart }: StepConfirmacaoProp
     : "Segue o comprovante do Pix! 👆";
 
   const msgRaw =
-    `🍔 *Burger Night - Pedido ${orderId}*\n\n` +
+    `🍔 *${CONFIG.displayName} - Pedido ${orderId}*\n\n` +
     `👤 Nome: ${normalizeForWhatsAppUrl(data.nome)}\n` +
     `📦 Combos: ${qtd}x\n` +
     `⏰ Janela: ${normalizeForWhatsAppUrl(getJanelaLabel(data.janela))}\n` +
