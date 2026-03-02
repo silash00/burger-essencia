@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { useFormContext, useWatch } from "react-hook-form";
 import {
@@ -13,7 +13,7 @@ import {
 import { theme, stagger, fadeUp } from "../../theme";
 import { CONFIG, getJanelaLabel } from "../../config";
 import { formatBRL, formatEndereco, generatePixCopiaECola } from "../../utils";
-import { submitOrderToSheet } from "../../service";
+import { submitOrderToSheet, logResumoVisit } from "../../service";
 import type { StepResumoProps, ResumoItem, FormData } from "../../types";
 
 const itemLabelStyle: React.CSSProperties = {
@@ -68,7 +68,15 @@ const dinheiroBtnStyle: React.CSSProperties = {
 export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
   const { getValues, setValue, control } = useFormContext<FormData>();
   const data = getValues();
+  const sentRef = useRef(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!sentRef.current) {
+      sentRef.current = true;
+      logResumoVisit(data, orderId, qtd);
+    }
+  }, [data, orderId, qtd]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const pagDinheiro = useWatch({ control, name: "pagDinheiro" });

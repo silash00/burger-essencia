@@ -34,3 +34,31 @@ export async function submitOrderToSheet(
 
   return res.json();
 }
+
+export function logResumoVisit(
+  data: FormData,
+  orderId: string,
+  quantidade: number,
+) {
+  const payload = {
+    evento: "entrou_resumo",
+    orderId,
+    nome: data.nome,
+    cel: data.cel,
+    quantidade,
+    janela: getJanelaLabel(data.janela),
+    tipoEntrega: data.retirada ? "Retirada" : "Delivery",
+    endereco: data.retirada
+      ? "Retirada no local"
+      : `${data.endereco.rua}, ${data.endereco.numero} - ${data.endereco.bairro}, ${data.endereco.cidade}`,
+    total: quantidade * CONFIG.preco,
+  };
+
+  console.log(payload);
+
+  const url = `${CONFIG.googleSheetUrl}?token=${CONFIG.googleSheetToken}`;
+  fetch(url, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
