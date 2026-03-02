@@ -54,8 +54,6 @@ export function logResumoVisit(
     total: quantidade * CONFIG.preco,
   };
 
-  console.log(payload);
-
   const url = `${CONFIG.googleSheetUrl}?token=${CONFIG.googleSheetToken}`;
   fetch(url, {
     method: "POST",
