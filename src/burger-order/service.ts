@@ -51,6 +51,7 @@ export function logResumoVisit(
     endereco: data.retirada
       ? "Retirada no local"
       : `${data.endereco.rua}, ${data.endereco.numero} - ${data.endereco.bairro}, ${data.endereco.cidade}`,
+    pagamento: data.pagDinheiro ? "Dinheiro" : "PIX",
     total: quantidade * CONFIG.preco,
   };
 

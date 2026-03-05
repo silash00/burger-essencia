@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { useFormContext, useWatch } from "react-hook-form";
 import {
@@ -71,12 +71,12 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
   const sentRef = useRef(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
+  function dispararLogResumo() {
     if (!sentRef.current) {
       sentRef.current = true;
-      logResumoVisit(data, orderId, qtd);
+      logResumoVisit(getValues(), orderId, qtd);
     }
-  }, [data, orderId, qtd]);
+  }
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const pagDinheiro = useWatch({ control, name: "pagDinheiro" });
@@ -86,7 +86,7 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
     setSubmitError(null);
     setSubmitting(true);
     try {
-      await submitOrderToSheet(data, orderId, qtd);
+      await submitOrderToSheet(getValues(), orderId, qtd);
       onNext();
     } catch (err) {
       const message =
@@ -100,6 +100,7 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
   }
 
   function copyPix() {
+    dispararLogResumo();
     const payload = generatePixCopiaECola(
       CONFIG.pixKey,
       total,
@@ -195,7 +196,10 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
                 </p>
                 <m.button
                   type="button"
-                  onClick={() => setValue("pagDinheiro", false)}
+                  onClick={() => {
+                    setValue("pagDinheiro", false);
+                    dispararLogResumo();
+                  }}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   style={{
@@ -278,7 +282,10 @@ export function StepResumo({ qtd, orderId, onNext, onBack }: StepResumoProps) {
 
               <m.button
                 type="button"
-                onClick={() => setValue("pagDinheiro", true)}
+                onClick={() => {
+                  setValue("pagDinheiro", true);
+                  dispararLogResumo();
+                }}
                 animate={{
                   background: "rgba(255,255,255,0.04)",
                   borderColor: theme.border,
