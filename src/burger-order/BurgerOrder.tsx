@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { LazyMotion, domAnimation } from "framer-motion";
 
 const BurgerOrder = () => {
